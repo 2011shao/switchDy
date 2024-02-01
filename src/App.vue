@@ -1,11 +1,12 @@
 
 <template>
   <main>
-    <switchDy class="p-all-5" />
+    <switchYtb class="p-all-5" />
   </main>
 </template>
 <script setup>
-import switchDy from "./components/switchDy.vue";
+// import switchDy from "./components/switchDy.vue";
+import switchYtb from "./components/switchYtb.vue";
 </script>
 
 <style>
