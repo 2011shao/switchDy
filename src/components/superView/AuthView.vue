@@ -13,13 +13,15 @@ onMounted(() => {
   if (state) {
     const backDic = getDyCode(state);
     const code=getUrlDataWithName('code')
-    console.log("返回值", backDic);
-    console.log("返回值code", code);
+    getUserInfo(code)
 
   }
 });
  function getUserInfo(){
   axios.get('http://170.106.194.62:5001/').then(res=>{
+    if(res.data.errCode==0){
+
+    }
 
   })
 

@@ -15,6 +15,7 @@ const import_table_id = ref(""); //导入人员时的表
 const export_table_id = ref(""); //导出人员时的表
 const comment_table_id = ref(""); //评论表
 
+
 bitable.base.onSelectionChange((event) => {
   // initBaeData();
   console.log("对对对", event);
@@ -104,7 +105,7 @@ async function switchTable(tableId) {
 // ----------------------------------一键创建配置表
 
 async function oneStepCreateManConfig() {
-  const tableName = "youtube视频解析";
+  const tableName = "抖音助手-视频信息表";
   const tableList = await bitable.base.getTableMetaList();
   const isExit = tableList.find((a) => a["name"] == tableName);
   if (isExit) {
@@ -114,12 +115,31 @@ async function oneStepCreateManConfig() {
   }
   const { tableId, index } = await bitable.base.addTable({ name: tableName, fields: [] });
   const table = await bitable.base.getTableById(tableId);
-  await table.addField({ type: FieldType.Url, name: "视频地址" });
-  await table.addField({ type: FieldType.Url, name: "视频缩略图" });
-  await table.addField({ type: FieldType.Text, name: "视频标题" });
+  await table.addField({ type: FieldType.Text, name: "视频id" });
+  const cover=await table.addField({ type: FieldType.Url, name: "视频封面" });
+  const title=await table.addField({ type: FieldType.Text, name: "视频标题" });
   await table.addField({ type: FieldType.Number, name: "播放量" });
   await table.addField({ type: FieldType.Number, name: "点赞数" });
+  await table.addField({ type: FieldType.Number, name: "下载数" });
+  await table.addField({ type: FieldType.Number, name: "分享数" });
+  await table.addField({ type: FieldType.Number, name: "转发数" });
+  await table.addField({ type: FieldType.Number, name: "分享数" });
   await table.addField({ type: FieldType.Number, name: "评论数" });
+  await table.addField({ type: FieldType.DateTime, name: "视频创建时间" });
+  await table.addField({ type: FieldType.CreatedTime, name: "数据同步时间" });
+  const  video_status= await table.addField({ type: FieldType.SingleSelect, name: "视频状态"});
+  const video_status_option = await table.getField(video_status);
+  await video_status_option.addOptions([{ name: "已发布" }, { name: "不适宜公开" },{ name: "审核中" }]);
+
+  const  media_type= await table.addField({ type: FieldType.SingleSelect, name: "媒体类型"});
+  const media_type_option = await table.getField(video_status);
+  await media_type_option.addOptions([{ name: "图集" }, { name: "视频" }]);
+
+  const  is_top= await table.addField({ type: FieldType.SingleSelect, name: "是否置顶"});
+  const is_top_option = await table.getField(video_status);
+  await is_top_option.addOptions([{ name: "是" }, { name: "否" }]);
+
+
   // switchTable(tableId)
   export_table_id.value = tableId;
 }
