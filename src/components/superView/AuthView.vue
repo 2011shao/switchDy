@@ -1,35 +1,87 @@
 
 <template>
-  <div class="">
-    <a-button type="primary" @click="webAuth">授权</a-button>
+  <div class="grid-one">
+    <a-divider>已授权抖音账号</a-divider>
+    <div class="row-between-center" v-if="!dy_user_table_id">
+      <a-typography-text>初次使用</a-typography-text>
+      <a-button status="success" @click="oneStepCreateAuthUserTable"
+        >请创建抖音用户表</a-button
+      >
+    </div>
+    <div class="row-between-center" v-else>
+      <a-typography-text>抖音用户表</a-typography-text>
+      <a-button @click="getDyUserList">刷新</a-button>
+    </div>
+    <a-space class="" wrap>
+      <div class="column-center-center" @click="webAuth">
+        <a-avatar :size="44" shape="square">
+          <icon-tiktok-color />
+        </a-avatar>
+        <a-typography-text>扫码授权</a-typography-text>
+      </div>
+      <div
+        class="column-center-center"
+        v-for="(item, index) in allUserArr"
+        :key="index"
+      >
+        <a-avatar :size="44" shape="square" >
+          <img
+        alt="avatar"
+        :src="item.avatar"
+      />
+        </a-avatar>
+        <a-typography-text>{{ item.nickname }}</a-typography-text>
+      </div>
+    </a-space>
   </div>
 </template>
 
 <script setup>
 import axios from "axios";
-import { onMounted } from "vue";
+import dayjs from "dayjs";
+import { ref, onMounted } from "vue";
+
+import {
+  dy_user_table_id,
+  dy_user_info_dic,
+  oneStepCreateAuthUserTable,
+  getDyUserList,
+  addBitRecord,
+  allUserArr,
+} from "../js/superBase";
+
 onMounted(() => {
   const state = getUrlDataWithName("state");
   if (state) {
     const backDic = getDyCode(state);
-    const code=getUrlDataWithName('code')
-    getUserInfo(code)
-
+    const code = getUrlDataWithName("code");
+    getUserInfo(code, backDic);
   }
 });
- function getUserInfo(){
-  axios.get('http://170.106.194.62:5001/').then(res=>{
-    if(res.data.errCode==0){
 
-    }
 
-  })
 
+
+function getUserInfo(code, dic) {
+  const url='https://4d2817de-abee-4c7e-8ded-de0807bdfdb4-00-164tnsiwbavws.sisko.replit.dev'
+  // const url='http://170.106.194.62:5001'
+  axios
+    .get(
+      `${url}/dyauth?code=${code}`
+    )
+    .then(async (res) => {
+      if (res.data.errCode == 0) {
+        const newDataArr = resultMapDic(res.data.data, dy_user_info_dic.value);
+        await addBitRecord(newDataArr, dy_user_table_id.value);
+      }
+    });
 }
 
 function webAuth() {
-  const canScope = "user_info,h5.share,fans.check,open.get.ticket";
-  let state = base64UrlEncode(encodeURIComponent('{"id":1,"back":"测试"}')); // encode后拼接到授权链接上
+  const canScope = "user_info,video.list.bind";
+  let state = base64UrlEncode(
+    encodeURIComponent(`{"back":"1"}`)
+  ); // encode后拼接到授权链接上
   window.location.href = `https://open.douyin.com/platform/oauth/connect/?client_key=awl98juj5xz2ruu9&response_type=code&state=${state}&scope=${canScope}&redirect_uri=${window.location.href}`;
 }
 
@@ -39,7 +91,6 @@ function getDyCode(state) {
 function getUrlDataWithName(name) {
   var reg = new RegExp("(^|\\?|&)" + name + "=([^&]*)(\\s|&|$)", "i"),
     url = window.location;
-
   if (reg.test(url)) {
     return unescape(RegExp.$2.replace(/\+/g, " "));
   }
@@ -58,6 +109,31 @@ function base64UrlDecode(str) {
   }
   return atob(str); // 解码 Base64 字符串
 }
+
+// 视频信息
+function resultMapDic(data, target_filed_dic) {
+  let dic = { fields: {} };
+  for (let key in target_filed_dic) {
+    if(key=='end_time'){
+      dic["fields"][target_filed_dic[key]] = dayjs().add(15,'day').valueOf()
+    }else{
+      dic["fields"][target_filed_dic[key]] = data[key];
+
+    }
+  }
+  for (let key in dic.fields) {
+    if (key == "undefined") {
+      delete dic.fields[key];
+    }
+  }
+  return dic;
+}
+
+// async function getAllAuthUserList(){
+//   const bit_selection = await bitable.base.getSelection()
+//   baseIdkey.value = bit_selection.baseId
+//   axios.get('')
+// }
 </script>
 
 <style>
