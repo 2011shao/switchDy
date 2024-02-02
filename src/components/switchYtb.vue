@@ -49,11 +49,10 @@ import AuthView from "./superView/AuthView.vue";
 
 import {
   dy_user_info_dic,
+  dy_user_table_id,
   bit_loading,
-  bit_table,
   export_table_id,
   addBitRecord,
-  comment_table_id,
   oneStepCreateVideoTable,
   allUserArr,
   getTableAllFieldFromId,
@@ -62,7 +61,7 @@ import SelectTableView from "./superView/selectTable.vue";
 import axios from "axios";
 import dayjs from "dayjs";
 const buttonLoading = ref(false);
-const exportAllFieldArr=ref([])
+const exportAllFieldArr = ref([]);
 const bit_import_dic = ref({
   origin_filed: "",
 });
@@ -77,7 +76,7 @@ const dy_video_info_dic = ref({
   download_count: "下载数",
   comment_count: "评论数",
   create_time: "视频创建时间",
-  update_create_time: "数据同步时间",
+  update_time: "数据同步时间",
   video_status: "视频状态",
   media_type: "媒体类型",
   is_top: "是否置顶",
@@ -111,11 +110,9 @@ async function exportVoid() {
   );
 
   let i = 0;
-   exportAllFieldArr.value = await getTableAllFieldFromId(export_table_id.value);
+  exportAllFieldArr.value = await getTableAllFieldFromId(export_table_id.value);
 
   for (const userInfo of allUserArr.value) {
-    i++;
-    progress.value = (i / allUserArr.value.length).toFixed(2);
     const url =
       "https://4d2817de-abee-4c7e-8ded-de0807bdfdb4-00-164tnsiwbavws.sisko.replit.dev";
     // const url='http://170.106.194.62:5001'
@@ -123,15 +120,21 @@ async function exportVoid() {
       .get(
         `${url}/videolist?open_id=${userInfo["open_id"]}&access_token=${userInfo["access_token"]}`
       )
-    if (resData.data.errCode == 0) {
+      .catch((err) => {
+        i++;
+        progress.value = (i / allUserArr.value.length).toFixed(2);
+      });
+
+    if (resData && resData.data.errCode == 0) {
       // 视频信息
       const newDataArr = resultMapDic(
         resData.data.data.list,
         target_filed_dic,
         userInfo
       );
-
       await addBitRecord(newDataArr, export_table_id.value);
+      i++;
+      progress.value = (i / allUserArr.value.length).toFixed(2);
     }
   }
   Message.success("解析完成");
@@ -144,34 +147,56 @@ function resultMapDic(dataArr, target_filed_dic, userInfo) {
   let arr = [];
   for (let data of dataArr) {
     Object.assign(data, data["statistics"]);
-    
+
     let dic = { fields: {} };
     for (let key in target_filed_dic) {
       if (key == "nickname") {
         dic["fields"][target_filed_dic[key]] = userInfo.nickname;
+      } else if (key == "update_time") {
+        dic["fields"][target_filed_dic[key]] = new Date().getTime();
       } else if (key == "media_type") {
         if (data[key] == "2") {
-          dic["fields"][target_filed_dic[key]] =getOptionId(target_filed_dic[key],"图集");
+          dic["fields"][target_filed_dic[key]] = getOptionId(
+            target_filed_dic[key],
+            "图集"
+          );
         }
         if (data[key] == "4") {
-          dic["fields"][target_filed_dic[key]] =getOptionId(target_filed_dic[key],"视频");
+          dic["fields"][target_filed_dic[key]] = getOptionId(
+            target_filed_dic[key],
+            "视频"
+          );
         }
       } else if (key == "is_top") {
         if (data[key]) {
-          dic["fields"][target_filed_dic[key]] =getOptionId(target_filed_dic[key],"是");
-        }
-        if (data[key] == "4") {
-          dic["fields"][target_filed_dic[key]] = getOptionId(target_filed_dic[key],"否");
+          dic["fields"][target_filed_dic[key]] = getOptionId(
+            target_filed_dic[key],
+            "是"
+          );
+        } else {
+          dic["fields"][target_filed_dic[key]] = getOptionId(
+            target_filed_dic[key],
+            "否"
+          );
         }
       } else if (key == "video_status") {
         if (data[key] == 1) {
-          dic["fields"][target_filed_dic[key]] =getOptionId(target_filed_dic[key], "已发布");
+          dic["fields"][target_filed_dic[key]] = getOptionId(
+            target_filed_dic[key],
+            "已发布"
+          );
         }
         if (data[key] == "2") {
-          dic["fields"][target_filed_dic[key]] =getOptionId(target_filed_dic[key],"不适宜公开");
+          dic["fields"][target_filed_dic[key]] = getOptionId(
+            target_filed_dic[key],
+            "不适宜公开"
+          );
         }
         if (data[key] == "4") {
-          dic["fields"][target_filed_dic[key]] = getOptionId(target_filed_dic[key],"审核中");
+          dic["fields"][target_filed_dic[key]] = getOptionId(
+            target_filed_dic[key],
+            "审核中"
+          );
         }
       } else {
         dic["fields"][target_filed_dic[key]] = data[key];
@@ -187,21 +212,24 @@ function resultMapDic(dataArr, target_filed_dic, userInfo) {
   return arr;
 }
 function getOptionId(fieldId, name) {
-  
   const czOption = exportAllFieldArr.value.find(
     (a) => a["id"] == fieldId && a["type"] == 3
   );
   if (czOption) {
     const czItem = czOption.property.options.find((a) => a["name"] == name);
     if (czItem) {
-      console.log(name,czItem.id)
-      return czItem.id;
+      return { id: czItem.id };
     }
   }
   return "";
 }
 const commitCan = computed(() => {
-  if (select_video_info_arr.value.length > 0 && export_table_id.value) {
+  if (
+    select_video_info_arr.value.length > 0 &&
+    export_table_id.value &&
+    dy_user_table_id.value &&
+    allUserArr.value.length > 0
+  ) {
     return true;
   }
 

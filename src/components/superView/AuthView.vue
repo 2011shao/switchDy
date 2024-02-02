@@ -2,15 +2,14 @@
 <template>
   <div class="grid-one">
     <a-divider>已授权抖音账号</a-divider>
-    <div class="row-between-center" v-if="!dy_user_table_id">
-      <a-typography-text>初次使用</a-typography-text>
+    <div class="row-center-center" v-if="!dy_user_table_id">
       <a-button status="success" @click="oneStepCreateAuthUserTable"
-        >请创建抖音用户表</a-button
+        >请先创建抖音用户表</a-button
       >
     </div>
     <div class="row-between-center" v-else>
       <a-typography-text>抖音用户表</a-typography-text>
-      <a-button @click="getDyUserList">刷新</a-button>
+      <a-button @click="getDyUserList" type="primary">刷新</a-button>
     </div>
     <a-space class="" wrap>
       <div class="column-center-center" @click="webAuth">
@@ -24,11 +23,8 @@
         v-for="(item, index) in allUserArr"
         :key="index"
       >
-        <a-avatar :size="44" shape="square" >
-          <img
-        alt="avatar"
-        :src="item.avatar"
-      />
+        <a-avatar :size="44" shape="square">
+          <img alt="avatar" :src="item.avatar" />
         </a-avatar>
         <a-typography-text>{{ item.nickname }}</a-typography-text>
       </div>
@@ -37,6 +33,7 @@
 </template>
 
 <script setup>
+import { Message } from "@arco-design/web-vue";
 import axios from "axios";
 import dayjs from "dayjs";
 import { ref, onMounted } from "vue";
@@ -59,29 +56,24 @@ onMounted(() => {
   }
 });
 
-
-
-
 function getUserInfo(code, dic) {
-  const url='https://4d2817de-abee-4c7e-8ded-de0807bdfdb4-00-164tnsiwbavws.sisko.replit.dev'
+  const url =
+    "https://4d2817de-abee-4c7e-8ded-de0807bdfdb4-00-164tnsiwbavws.sisko.replit.dev";
   // const url='http://170.106.194.62:5001'
-  axios
-    .get(
-      `${url}/dyauth?code=${code}`
-    )
-    .then(async (res) => {
-      if (res.data.errCode == 0) {
-        const newDataArr = resultMapDic(res.data.data, dy_user_info_dic.value);
-        await addBitRecord(newDataArr, dy_user_table_id.value);
-      }
-    });
+  axios.get(`${url}/dyauth?code=${code}`).then(async (res) => {
+    if (res.data.errCode == 0) {
+      const newDataArr = resultMapDic(res.data.data, dy_user_info_dic.value);
+      await addBitRecord(newDataArr, dy_user_table_id.value);
+    }
+  });
 }
 
 function webAuth() {
+  if (!dy_user_table_id.value) {
+    return Message.info("请先创建抖音用户表");
+  }
   const canScope = "user_info,video.list.bind";
-  let state = base64UrlEncode(
-    encodeURIComponent(`{"back":"1"}`)
-  ); // encode后拼接到授权链接上
+  let state = base64UrlEncode(encodeURIComponent(`{"back":"1"}`)); // encode后拼接到授权链接上
   window.location.href = `https://open.douyin.com/platform/oauth/connect/?client_key=awl98juj5xz2ruu9&response_type=code&state=${state}&scope=${canScope}&redirect_uri=${window.location.href}`;
 }
 
@@ -114,11 +106,10 @@ function base64UrlDecode(str) {
 function resultMapDic(data, target_filed_dic) {
   let dic = { fields: {} };
   for (let key in target_filed_dic) {
-    if(key=='end_time'){
-      dic["fields"][target_filed_dic[key]] = dayjs().add(15,'day').valueOf()
-    }else{
+    if (key == "end_time") {
+      dic["fields"][target_filed_dic[key]] = dayjs().add(14, "day").valueOf();
+    } else {
       dic["fields"][target_filed_dic[key]] = data[key];
-
     }
   }
   for (let key in dic.fields) {

@@ -1,6 +1,8 @@
 import { bitable, FieldType, ITable } from "@lark-base-open/js-sdk";
 import dayjs from "dayjs";
 import { ref, watchEffect } from "vue";
+import { Message } from "@arco-design/web-vue";
+
 let bit_table: ITable;
 const bit_loading = ref(false);
 const bit_all_fieldList = ref<any>([{ name: "ddd", id: "111", type: 1 }]);
@@ -14,8 +16,6 @@ const bit_select_dic = ref<any>({
 });
 const dy_user_table_id = ref(""); //导入人员时的表
 const export_table_id = ref(""); //导出人员时的表
-const comment_table_id = ref(""); //评论表
-const baseIdkey = ref("");
 const allUserArr = ref([]);
 const dy_user_info_dic = ref({
   avatar: "头像",
@@ -42,17 +42,17 @@ async function getAllField(loadCache = false) {
   const fieldMetaList = await bit_table.getFieldMetaList();
   console.log("所有的字段", fieldMetaList);
   bit_all_fieldList.value = fieldMetaList;
-  getAllTable();
+  // getAllTable();
   bit_loading.value = false;
 }
 async function getTableAllFieldFromId(tableId) {
   const result_table = await bitable.base.getTableById(tableId);
   const fieldMetaList = await result_table.getFieldMetaList();
   return fieldMetaList
- 
+
 }
 initBaeData();
-export { getTableAllFieldFromId,initBaeData, getAllField, dy_user_table_id, export_table_id, comment_table_id };
+export { getTableAllFieldFromId, initBaeData, getAllField, dy_user_table_id, export_table_id };
 // ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
 // 新增字段
@@ -139,6 +139,7 @@ async function getAllTable(loadCache = false) {
       dic.end_time = await table.addField({ type: FieldType.DateTime, name: "授权到期时间" });
     }
     dy_user_table_id.value = exitTable.id;
+    debugger
     dy_user_info_dic.value = dic;
     getDyUserList();
   }
@@ -165,13 +166,12 @@ async function getDyUserList() {
   const fieldMetaList = await table.getFieldMetaList();
   const viewList = await table.getViewList();
   const view = viewList[0];
-  // await table.getActiveView();
-  // const view = await table.getViewById("viewId");
   const recordIdList = await view.getVisibleRecordIdList();
   let arr = [];
   for (const recordId of recordIdList) {
     let dic = {};
     const { fields } = await table.getRecordById(recordId);
+    dic['recordId'] = recordId
     for (let key of Object.keys(dy_user_info_dic.value)) {
       const value = fields[dy_user_info_dic.value[key]];
       if (value) {
@@ -187,14 +187,23 @@ async function getDyUserList() {
       }
     }
     if (dic["access_token"] && dic["open_id"]) {
-      const cz = arr.find((a) => a["open_id"] == dic["open_id"]);
-      if (!cz) {
+      const czIndex = arr.findIndex((a) => a["open_id"] == dic["open_id"]);
+      if (czIndex < 0) {
         arr.push(dic);
+      } else {
+        if (dayjs(dic['end_time']).isAfter(dayjs(arr[czIndex]['end_time']))) {
+          await table.deleteRecord(arr[czIndex]['recordId'])
+          arr.splice(czIndex, 1)
+          arr.push(dic)
+        } else {
+          await table.deleteRecord(dic['recordId'])
+        }
       }
     }
   }
-
   allUserArr.value = arr;
+  Message.success(`共${arr.length}人`);
+
 }
 
 async function oneStepCreateAuthUserTable() {
