@@ -11,12 +11,13 @@
       <a-typography-text>抖音用户表</a-typography-text>
       <a-button @click="getDyUserList" type="primary">刷新</a-button>
     </div>
-    <a-space class="" wrap>
+    <a-space class="" wrap v-if="dy_user_table_id">
       <div class="column-center-center" @click="webAuth">
-        <a-avatar :size="44" shape="square">
-          <icon-tiktok-color />
+        <a-avatar :size="44" shape="square" :style="{ backgroundColor: '#000' }">
+          <!-- <icon-tiktok-color /> -->
+          <img src="/src/assets/dy.png"/>
         </a-avatar>
-        <a-typography-text>扫码授权</a-typography-text>
+        <a-typography-text>点击授权</a-typography-text>
       </div>
       <div
         class="column-center-center"
@@ -57,9 +58,9 @@ onMounted(() => {
 });
 
 function getUserInfo(code, dic) {
-  const url =
-    "https://4d2817de-abee-4c7e-8ded-de0807bdfdb4-00-164tnsiwbavws.sisko.replit.dev";
-  // const url='http://170.106.194.62:5001'
+  // const url =
+  //   "https://4d2817de-abee-4c7e-8ded-de0807bdfdb4-00-164tnsiwbavws.sisko.replit.dev";
+  const url='https://wk.mobilenail.vip:5001'
   axios.get(`${url}/dyauth?code=${code}`).then(async (res) => {
     if (res.data.errCode == 0) {
       const newDataArr = resultMapDic(res.data.data, dy_user_info_dic.value);
@@ -74,7 +75,7 @@ function webAuth() {
   }
   const canScope = "user_info,video.list.bind";
   let state = base64UrlEncode(encodeURIComponent(`{"back":"1"}`)); // encode后拼接到授权链接上
-  window.location.href = `https://open.douyin.com/platform/oauth/connect/?client_key=awl98juj5xz2ruu9&response_type=code&state=${state}&scope=${canScope}&redirect_uri=${window.location.href}`;
+  window.location.href = `https://open.douyin.com/platform/oauth/connect/?client_key=awl98juj5xz2ruu9&response_type=code&state=${state}&scope=${canScope}&redirect_uri=https://xiaoyuzhou.guodunnote.com/switchDy/`;
 }
 
 function getDyCode(state) {

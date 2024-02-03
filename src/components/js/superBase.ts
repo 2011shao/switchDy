@@ -5,7 +5,7 @@ import { Message } from "@arco-design/web-vue";
 
 let bit_table: ITable;
 const bit_loading = ref(false);
-const bit_all_fieldList = ref<any>([{ name: "ddd", id: "111", type: 1 }]);
+const bit_all_fieldList = ref<any>([]);
 const bit_all_table = ref<any>([]);
 const bit_select_dic = ref<any>({
   baseId: "",
@@ -27,6 +27,7 @@ const dy_user_info_dic = ref({
 bitable.base.onSelectionChange((event) => {
   if (event.data.tableId != bit_select_dic.value.tableId) {
     initBaeData();
+    getAllTable();
   }
   bit_select_dic.value = event.data;
 });
@@ -42,14 +43,12 @@ async function getAllField(loadCache = false) {
   const fieldMetaList = await bit_table.getFieldMetaList();
   console.log("所有的字段", fieldMetaList);
   bit_all_fieldList.value = fieldMetaList;
-  // getAllTable();
   bit_loading.value = false;
 }
 async function getTableAllFieldFromId(tableId) {
   const result_table = await bitable.base.getTableById(tableId);
   const fieldMetaList = await result_table.getFieldMetaList();
-  return fieldMetaList
-
+  return fieldMetaList;
 }
 initBaeData();
 export { getTableAllFieldFromId, initBaeData, getAllField, dy_user_table_id, export_table_id };
@@ -139,9 +138,10 @@ async function getAllTable(loadCache = false) {
       dic.end_time = await table.addField({ type: FieldType.DateTime, name: "授权到期时间" });
     }
     dy_user_table_id.value = exitTable.id;
-    debugger
     dy_user_info_dic.value = dic;
     getDyUserList();
+  } else {
+    dy_user_table_id.value = "";
   }
 }
 async function addBitNewTable(tableName) {
@@ -163,7 +163,7 @@ async function switchTable(tableId) {
 async function getDyUserList() {
   const tableId = dy_user_table_id.value;
   const table = await bitable.base.getTableById(tableId);
-  const fieldMetaList = await table.getFieldMetaList();
+  // const fieldMetaList = await table.getFieldMetaList();
   const viewList = await table.getViewList();
   const view = viewList[0];
   const recordIdList = await view.getVisibleRecordIdList();
@@ -171,7 +171,7 @@ async function getDyUserList() {
   for (const recordId of recordIdList) {
     let dic = {};
     const { fields } = await table.getRecordById(recordId);
-    dic['recordId'] = recordId
+    dic["recordId"] = recordId;
     for (let key of Object.keys(dy_user_info_dic.value)) {
       const value = fields[dy_user_info_dic.value[key]];
       if (value) {
@@ -191,23 +191,23 @@ async function getDyUserList() {
       if (czIndex < 0) {
         arr.push(dic);
       } else {
-        if (dayjs(dic['end_time']).isAfter(dayjs(arr[czIndex]['end_time']))) {
-          await table.deleteRecord(arr[czIndex]['recordId'])
-          arr.splice(czIndex, 1)
-          arr.push(dic)
+        if (dayjs(dic["end_time"]).isAfter(dayjs(arr[czIndex]["end_time"]))) {
+          await table.deleteRecord(arr[czIndex]["recordId"]);
+          arr.splice(czIndex, 1);
+          arr.push(dic);
         } else {
-          await table.deleteRecord(dic['recordId'])
+          await table.deleteRecord(dic["recordId"]);
         }
       }
     }
   }
   allUserArr.value = arr;
   Message.success(`共${arr.length}人`);
-
 }
 
 async function oneStepCreateAuthUserTable() {
   const { tableId } = await bitable.base.addTable({ name: "抖音用户表", fields: [] });
+  dy_user_table_id.value = tableId;
   const table = await bitable.base.getTableById(tableId);
   let dic = {
     avatar: "头像",
@@ -222,6 +222,7 @@ async function oneStepCreateAuthUserTable() {
   dic.access_token = await table.addField({ type: FieldType.Text, name: "access_token" });
   dic.end_time = await table.addField({ type: FieldType.DateTime, name: "授权到期时间" });
   dy_user_info_dic.value = dic;
+  Message.success("创建成功");
 }
 async function oneStepCreateVideoTable(name, tableId) {
   const table = await bitable.base.getTableById(tableId);
