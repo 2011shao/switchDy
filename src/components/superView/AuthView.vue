@@ -13,9 +13,13 @@
     </div>
     <a-space class="" wrap v-if="dy_user_table_id">
       <div class="column-center-center" @click="webAuth">
-        <a-avatar :size="44" shape="square" :style="{ backgroundColor: '#000' }">
+        <a-avatar
+          :size="44"
+          shape="square"
+          :style="{ backgroundColor: '#000' }"
+        >
           <!-- <icon-tiktok-color /> -->
-          <img src="/src/assets/dy.png"/>
+          <img src="/src/assets/dy.png" />
         </a-avatar>
         <a-typography-text>点击授权</a-typography-text>
       </div>
@@ -57,14 +61,23 @@ onMounted(() => {
   }
 });
 
+async function test() {
+  const newDataArr = resultMapDic(
+    { open_id: "open_id", access_token: "access_token" },
+    dy_user_info_dic.value
+  );
+  await addBitRecord(newDataArr, dy_user_table_id.value);
+}
+
 function getUserInfo(code, dic) {
   // const url =
   //   "https://4d2817de-abee-4c7e-8ded-de0807bdfdb4-00-164tnsiwbavws.sisko.replit.dev";
-  const url='https://wk.mobilenail.vip:5001'
+  const url = "https://wk.mobilenail.vip:5001";
   axios.get(`${url}/dyauth?code=${code}`).then(async (res) => {
     if (res.data.errCode == 0) {
       const newDataArr = resultMapDic(res.data.data, dy_user_info_dic.value);
       await addBitRecord(newDataArr, dy_user_table_id.value);
+      getDyUserList()
     }
   });
 }

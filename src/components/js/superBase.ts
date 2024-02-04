@@ -191,6 +191,7 @@ async function getDyUserList() {
       if (czIndex < 0) {
         arr.push(dic);
       } else {
+        debugger
         if (dayjs(dic["end_time"]).isAfter(dayjs(arr[czIndex]["end_time"]))) {
           await table.deleteRecord(arr[czIndex]["recordId"]);
           arr.splice(czIndex, 1);
