@@ -113,14 +113,20 @@ async function exportVoid() {
   exportAllFieldArr.value = await getTableAllFieldFromId(export_table_id.value);
 
   for (const userInfo of allUserArr.value) {
-    // const url =
-    // "https://4d2817de-abee-4c7e-8ded-de0807bdfdb4-00-164tnsiwbavws.sisko.replit.dev";
-    // const url='http://170.106.194.62:5001'
-    const url = "https://wk.mobilenail.vip:5001";
-
+    const url =
+      "https://3afd9d97-3bbf-4feb-bbe5-c84c209c9954-00-272avr8nhhznn.pike.replit.dev/";
     const resData = await axios
-      .get(
-        `${url}/videolist?open_id=${userInfo["open_id"]}&access_token=${userInfo["access_token"]}`
+      .post(
+        `${url}/videolist`,
+        {
+          open_id: userInfo["open_id"],
+          access_token: userInfo["access_token"],
+        },
+        {
+          headers: {
+            "Content-Type": "application/json",
+          },
+        }
       )
       .catch((err) => {
         i++;

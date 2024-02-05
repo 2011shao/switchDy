@@ -70,14 +70,13 @@ async function test() {
 }
 
 function getUserInfo(code, dic) {
-  // const url =
-  //   "https://4d2817de-abee-4c7e-8ded-de0807bdfdb4-00-164tnsiwbavws.sisko.replit.dev";
-  const url = "https://wk.mobilenail.vip:5001";
+  const url =
+    "https://3afd9d97-3bbf-4feb-bbe5-c84c209c9954-00-272avr8nhhznn.pike.replit.dev";
   axios.get(`${url}/dyauth?code=${code}`).then(async (res) => {
     if (res.data.errCode == 0) {
       const newDataArr = resultMapDic(res.data.data, dy_user_info_dic.value);
       await addBitRecord(newDataArr, dy_user_table_id.value);
-      getDyUserList()
+      getDyUserList();
     }
   });
 }
@@ -88,7 +87,7 @@ function webAuth() {
   }
   const canScope = "user_info,video.list.bind";
   let state = base64UrlEncode(encodeURIComponent(`{"back":"1"}`)); // encode后拼接到授权链接上
-  window.location.href = `https://open.douyin.com/platform/oauth/connect/?client_key=awl98juj5xz2ruu9&response_type=code&state=${state}&scope=${canScope}&redirect_uri=https://xiaoyuzhou.guodunnote.com/switchDy/`;
+  window.location.href = `https://open.douyin.com/platform/oauth/connect/?client_key=awl98juj5xz2ruu9&response_type=code&state=${state}&scope=${canScope}&redirect_uri=https://switch-dy.replit.app/`;
 }
 
 function getDyCode(state) {
