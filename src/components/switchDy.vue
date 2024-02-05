@@ -113,8 +113,7 @@ async function exportVoid() {
   exportAllFieldArr.value = await getTableAllFieldFromId(export_table_id.value);
 
   for (const userInfo of allUserArr.value) {
-    const url =
-      "https://3afd9d97-3bbf-4feb-bbe5-c84c209c9954-00-272avr8nhhznn.pike.replit.dev/";
+    const url = "https://fsdyserver-lark-base.replit.app";
     const resData = await axios
       .post(
         `${url}/videolist`,

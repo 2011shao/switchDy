@@ -70,8 +70,7 @@ async function test() {
 }
 
 function getUserInfo(code, dic) {
-  const url =
-    "https://3afd9d97-3bbf-4feb-bbe5-c84c209c9954-00-272avr8nhhznn.pike.replit.dev";
+  const url = "https://fsdyserver-lark-base.replit.app";
   axios.get(`${url}/dyauth?code=${code}`).then(async (res) => {
     if (res.data.errCode == 0) {
       const newDataArr = resultMapDic(res.data.data, dy_user_info_dic.value);
