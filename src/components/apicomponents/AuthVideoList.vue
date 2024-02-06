@@ -110,10 +110,9 @@ async function exportVoid() {
         access_token: userInfo["access_token"],
       })
       .catch((err) => {});
-    debugger;
-    if (resData && resData.errCode == 0) {
+    if (resData) {
       // 视频信息
-      const newDataArr = resultMapDic(resData, target_filed_dic, userInfo);
+      const newDataArr = resultMapDic(resData.list, target_filed_dic, userInfo);
       await addBitRecord(newDataArr, export_table_id.value);
     }
     i++;
