@@ -84,7 +84,7 @@ function webAuth() {
     return Message.info("请先创建抖音用户表");
   }
   const canScope = "user_info,video.list.bind";
-  const authBackUrl = import.meta.env.VITE_API_AUTH_URL;
+  const authBackUrl ='https://switch-dy.replit.app/'
   let state = base64UrlEncode(encodeURIComponent(`{"back":"1"}`)); // encode后拼接到授权链接上
   window.location.href = `https://open.douyin.com/platform/oauth/connect/?client_key=awl98juj5xz2ruu9&response_type=code&state=${state}&scope=${canScope}&redirect_uri=${authBackUrl}`;
 }
