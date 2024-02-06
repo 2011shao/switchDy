@@ -70,10 +70,9 @@ async function test() {
 }
 
 function getUserInfo(code, dic) {
-  const url = "https://fsdyserver-lark-base.replit.app";
-  axios.get(`${url}/dyauth?code=${code}`).then(async (res) => {
-    if (res.data.errCode == 0) {
-      const newDataArr = resultMapDic(res.data.data, dy_user_info_dic.value);
+  axios.get(`/dyauth?code=${code}`).then(async (res) => {
+    if (res) {
+      const newDataArr = resultMapDic(res, dy_user_info_dic.value);
       await addBitRecord(newDataArr, dy_user_table_id.value);
       getDyUserList();
     }
@@ -85,8 +84,9 @@ function webAuth() {
     return Message.info("请先创建抖音用户表");
   }
   const canScope = "user_info,video.list.bind";
+  const authBackUrl = import.meta.env.VITE_API_AUTH_URL;
   let state = base64UrlEncode(encodeURIComponent(`{"back":"1"}`)); // encode后拼接到授权链接上
-  window.location.href = `https://open.douyin.com/platform/oauth/connect/?client_key=awl98juj5xz2ruu9&response_type=code&state=${state}&scope=${canScope}&redirect_uri=https://switch-dy.replit.app/`;
+  window.location.href = `https://open.douyin.com/platform/oauth/connect/?client_key=awl98juj5xz2ruu9&response_type=code&state=${state}&scope=${canScope}&redirect_uri=${authBackUrl}`;
 }
 
 function getDyCode(state) {
