@@ -1,7 +1,7 @@
 import axios from 'axios';
 import { Message, Modal } from '@arco-design/web-vue';
 // if (import.meta.env.VITE_API_BASE_URL) {
-axios.defaults.baseURL = 'https://fsdyserver-lark-base.replit.app'
+axios.defaults.baseURL = 'https://fsdyserver.replit.app/'
 // }
 axios.defaults.headers.post['Content-Type'] = "application/json"
 axios.interceptors.request.use(
