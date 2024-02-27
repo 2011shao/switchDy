@@ -140,18 +140,18 @@ async function getAllTable(loadCache = false) {
     } else {
       dic.end_time = await table.addField({ type: FieldType.DateTime, name: "授权到期时间" });
     }
-    const query_video_end_timeItem = fieldMetaList.find((a) => a["name"] == "截止日期");
-    if (query_video_end_timeItem) {
-      dic.query_video_end_time = query_video_end_timeItem.id;
-    } else {
-      dic.query_video_end_time = await table.addField({ type: FieldType.DateTime, name: "截止日期" });
-    }
-    const query_video_start_timeItem = fieldMetaList.find((a) => a["name"] == "起始日期");
-    if (query_video_start_timeItem) {
-      dic.query_video_start_time = query_video_start_timeItem.id;
-    } else {
-      dic.query_video_start_time = await table.addField({ type: FieldType.DateTime, name: "起始日期" });
-    }
+    // const query_video_end_timeItem = fieldMetaList.find((a) => a["name"] == "截止日期");
+    // if (query_video_end_timeItem) {
+    //   dic.query_video_end_time = query_video_end_timeItem.id;
+    // } else {
+    //   dic.query_video_end_time = await table.addField({ type: FieldType.DateTime, name: "截止日期" });
+    // }
+    // const query_video_start_timeItem = fieldMetaList.find((a) => a["name"] == "起始日期");
+    // if (query_video_start_timeItem) {
+    //   dic.query_video_start_time = query_video_start_timeItem.id;
+    // } else {
+    //   dic.query_video_start_time = await table.addField({ type: FieldType.DateTime, name: "起始日期" });
+    // }
 
     dy_user_table_id.value = exitTable.id;
     dy_user_info_dic.value = dic;
@@ -240,8 +240,8 @@ async function oneStepCreateAuthUserTable() {
   dic.open_id = await table.addField({ type: FieldType.Text, name: "open_id" });
   dic.access_token = await table.addField({ type: FieldType.Text, name: "access_token" });
   dic.end_time = await table.addField({ type: FieldType.DateTime, name: "授权到期时间" });
-  dic.query_video_start_time = await table.addField({ type: FieldType.DateTime, name: "起始日期", description: { content: "从那一天开始查取" } });
-  dic.query_video_end_time = await table.addField({ type: FieldType.DateTime, name: "截止日期", description: { content: "默认为当期日期" } });
+  // dic.query_video_start_time = await table.addField({ type: FieldType.DateTime, name: "起始日期", description: { content: "从那一天开始查取" } });
+  // dic.query_video_end_time = await table.addField({ type: FieldType.DateTime, name: "截止日期", description: { content: "默认为当期日期" } });
   dy_user_info_dic.value = dic;
   Message.success("创建成功");
 }

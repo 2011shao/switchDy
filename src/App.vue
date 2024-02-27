@@ -2,23 +2,21 @@
 <template>
   <main>
     <switchDy class="p-all-5" />
-    <div class="fixed-bottom  row-center-center" >
-      
+    <!-- <div class="fixed-bottom  row-center-center" >
       <a-typography-text class="m-lr-10" @click="openDoc">Terms of Service</a-typography-text>
       <a-typography-text @click="openPrivacyDoc">Privacy Policy</a-typography-text>
-
-    </div>
+    </div> -->
   </main>
 </template>
 <script setup>
 import switchDy from "./components/switchDy.vue";
-function openDoc(){
+function openDoc() {
   window.open(
     "https://xiaoyuzhou.guodunnote.com/switchTiktok/agreement.html",
     "_blank"
   );
 }
-function openPrivacyDoc(){
+function openPrivacyDoc() {
   window.open(
     "https://xiaoyuzhou.guodunnote.com/switchTiktok/Privacy.html",
     "_blank"
@@ -37,6 +35,19 @@ main {
   width: 70px;
   text-align: center;
   flex-shrink: 0;
+}
+/* 在屏幕宽度小于等于500px时应用以下样式 */
+@media (max-width: 500px) {
+  .arco-picker-range-wrapper {
+    flex-direction: column;
+  }
+}
+
+/* 在屏幕宽度大于500px时应用以下样式 */
+@media (min-width: 501px) {
+  .arco-picker-range-wrapper {
+    flex-direction: row;
+  }
 }
 h4 {
   font-size: calc(1.275rem + 0.3vw);

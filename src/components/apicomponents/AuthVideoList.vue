@@ -5,6 +5,16 @@
       <div class="grid-one p-all-1 grid-gap-5">
         <AuthView></AuthView>
         <a-divider>视频信息</a-divider>
+        <div class="row-start-center">
+          <a-typography-text class="flex-shrink m-r-10"
+            >搜索范围</a-typography-text
+          >
+          <a-range-picker
+            class="flex-grow"
+            v-model="dateRangeArr"
+            :allow-clear="false"
+          ></a-range-picker>
+        </div>
         <SelectTableView
           title="抖音视频表"
           canAdd
@@ -35,7 +45,7 @@
   </div>
 </template>
             
-            <script setup >
+<script setup >
 import { ref, onMounted, computed, watch, onUnmounted } from "vue";
 import { Message } from "@arco-design/web-vue";
 import AuthView from "../superView/AuthView.vue";
@@ -55,7 +65,10 @@ import axios from "axios";
 import dayjs from "dayjs";
 const buttonLoading = ref(false);
 const exportAllFieldArr = ref([]);
-
+const dateRangeArr = ref([
+  dayjs().startOf("year").format("YYYY-MM-DD"),
+  dayjs().format("YYYY-MM-DD"),
+]);
 const dy_video_info_dic = ref({
   cover: "视频封面",
   item_id: "视频id",
@@ -77,6 +90,8 @@ const dy_video_info_dic = ref({
 const select_video_info_arr = ref([]);
 const progress = ref(0);
 onMounted(() => {
+  console.log("日期", dayjs("2024-02-25").isBefore("2024-02-26"));
+
   select_video_info_arr.value = Object.keys(dy_video_info_dic.value);
 });
 
@@ -104,17 +119,12 @@ async function exportVoid() {
   exportAllFieldArr.value = await getTableAllFieldFromId(export_table_id.value);
 
   for (const userInfo of allUserArr.value) {
-    debugger;
     const resData = await axios
       .post("/videolist", {
         open_id: userInfo["open_id"],
         access_token: userInfo["access_token"],
-        start_date: dayjs(userInfo["query_video_start_time"]).isValid()
-          ? new Date(`${userInfo["query_video_start_time"]} 00:00:00`).getTime()
-          : "",
-        end_date: dayjs(userInfo["query_video_end_time"]).isValid()
-          ? new Date(`${userInfo["query_video_end_time"]} 23:59:59`).getTime()
-          : 0,
+        start_date: new Date(`${dateRangeArr.value[0]} 00:00:00`).getTime(),
+        end_date: new Date(`${dateRangeArr.value[1]} 23:59:59`).getTime(),
       })
       .catch((err) => {});
     if (resData) {
