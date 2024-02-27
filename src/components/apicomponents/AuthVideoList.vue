@@ -104,16 +104,25 @@ async function exportVoid() {
   exportAllFieldArr.value = await getTableAllFieldFromId(export_table_id.value);
 
   for (const userInfo of allUserArr.value) {
+    debugger;
     const resData = await axios
       .post("/videolist", {
         open_id: userInfo["open_id"],
         access_token: userInfo["access_token"],
+        start_date: dayjs(userInfo["query_video_start_time"]).isValid()
+          ? new Date(`${userInfo["query_video_start_time"]} 00:00:00`).getTime()
+          : "",
+        end_date: dayjs(userInfo["query_video_end_time"]).isValid()
+          ? new Date(`${userInfo["query_video_end_time"]} 23:59:59`).getTime()
+          : 0,
       })
       .catch((err) => {});
     if (resData) {
       // 视频信息
-      const newDataArr = resultMapDic(resData.list, target_filed_dic, userInfo);
-      await addBitRecord(newDataArr, export_table_id.value);
+      const newDataArr = resultMapDic(resData, target_filed_dic, userInfo);
+      if (newDataArr.length > 0) {
+        await addBitRecord(newDataArr, export_table_id.value);
+      }
     }
     i++;
     progress.value = (i / allUserArr.value.length).toFixed(2);

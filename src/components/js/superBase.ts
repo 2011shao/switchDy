@@ -106,6 +106,9 @@ async function getAllTable(loadCache = false) {
       open_id: "",
       access_token: "播放量",
       end_time: "授权到期时间",
+      query_video_end_time: "截止日期",
+      query_video_start_time: "起始日期",
+
     };
     const avatarItem = fieldMetaList.find((a) => a["name"] == "头像");
     if (avatarItem) {
@@ -137,6 +140,19 @@ async function getAllTable(loadCache = false) {
     } else {
       dic.end_time = await table.addField({ type: FieldType.DateTime, name: "授权到期时间" });
     }
+    const query_video_end_timeItem = fieldMetaList.find((a) => a["name"] == "截止日期");
+    if (query_video_end_timeItem) {
+      dic.query_video_end_time = query_video_end_timeItem.id;
+    } else {
+      dic.query_video_end_time = await table.addField({ type: FieldType.DateTime, name: "截止日期" });
+    }
+    const query_video_start_timeItem = fieldMetaList.find((a) => a["name"] == "起始日期");
+    if (query_video_start_timeItem) {
+      dic.query_video_start_time = query_video_start_timeItem.id;
+    } else {
+      dic.query_video_start_time = await table.addField({ type: FieldType.DateTime, name: "起始日期" });
+    }
+
     dy_user_table_id.value = exitTable.id;
     dy_user_info_dic.value = dic;
     getDyUserList();
@@ -178,7 +194,7 @@ async function getDyUserList() {
         if (Array.isArray(value)) {
           if (value.length > 0) dic[key] = value[0]["text"];
         } else {
-          if (key == "end_time") {
+          if (["end_time", 'query_video_start_time', 'query_video_end_time']) {
             dic[key] = dayjs(value).format("YYYY-MM-DD");
           } else {
             dic[key] = value;
@@ -216,12 +232,16 @@ async function oneStepCreateAuthUserTable() {
     open_id: "视频标题",
     access_token: "播放量",
     end_time: "授权到期时间",
+    query_video_start_time: "起始日期",
+    query_video_end_time: "截止日期",
   };
   dic.avatar = await table.addField({ type: FieldType.Text, name: "头像" });
   dic.nickname = await table.addField({ type: FieldType.Text, name: "昵称" });
   dic.open_id = await table.addField({ type: FieldType.Text, name: "open_id" });
   dic.access_token = await table.addField({ type: FieldType.Text, name: "access_token" });
   dic.end_time = await table.addField({ type: FieldType.DateTime, name: "授权到期时间" });
+  dic.query_video_start_time = await table.addField({ type: FieldType.DateTime, name: "起始日期", description: { content: "从那一天开始查取" } });
+  dic.query_video_end_time = await table.addField({ type: FieldType.DateTime, name: "截止日期", description: { content: "默认为当期日期" } });
   dy_user_info_dic.value = dic;
   Message.success("创建成功");
 }
