@@ -53,6 +53,7 @@ import {
 } from "../js/superBase";
 
 onMounted(() => {
+  console.log('当前版本2024.03.06')
   const state = getUrlDataWithName("state");
   if (state) {
     const backDic = getDyCode(state);
@@ -73,6 +74,8 @@ function getUserInfo(code, dic) {
   axios.get(`/dyauth?code=${code}`).then(async (res) => {
     if (res) {
       const newDataArr = resultMapDic(res, dy_user_info_dic.value);
+      console.log('--1',newDataArr)
+      console.log('--2',dy_user_table_id.value)
       await addBitRecord(newDataArr, dy_user_table_id.value);
       getDyUserList();
     }
