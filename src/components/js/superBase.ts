@@ -106,8 +106,8 @@ async function getAllTable(loadCache = false) {
       open_id: "",
       access_token: "播放量",
       end_time: "授权到期时间",
-      query_video_end_time: "截止日期",
-      query_video_start_time: "起始日期",
+      // query_video_end_time: "截止日期",
+      // query_video_start_time: "起始日期",
 
     };
     const avatarItem = fieldMetaList.find((a) => a["name"] == "头像");
@@ -231,9 +231,9 @@ async function oneStepCreateAuthUserTable() {
     nickname: "昵称",
     open_id: "视频标题",
     access_token: "播放量",
-    end_time: "授权到期时间",
-    query_video_start_time: "起始日期",
-    query_video_end_time: "截止日期",
+    end_time: "授权到期时间"
+    // query_video_start_time: "起始日期",
+    // query_video_end_time: "截止日期",
   };
   dic.avatar = await table.addField({ type: FieldType.Text, name: "头像" });
   dic.nickname = await table.addField({ type: FieldType.Text, name: "昵称" });
