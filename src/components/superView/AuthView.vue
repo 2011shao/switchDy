@@ -53,7 +53,7 @@ import {
 } from "../js/superBase";
 
 onMounted(() => {
-  console.log('当前版本2024.03.06')
+  console.log('当前版本2024.03.19')
   const state = getUrlDataWithName("state");
   if (state) {
     const backDic = getDyCode(state);
@@ -74,8 +74,7 @@ function getUserInfo(code, dic) {
   axios.get(`/dyauth?code=${code}`).then(async (res) => {
     if (res) {
       const newDataArr = resultMapDic(res, dy_user_info_dic.value);
-      console.log('--1',newDataArr)
-      console.log('--2',dy_user_table_id.value)
+     
       await addBitRecord(newDataArr, dy_user_table_id.value);
       getDyUserList();
     }
@@ -87,7 +86,7 @@ function webAuth() {
     return Message.info("请先创建抖音用户表");
   }
   const canScope = "user_info,video.list.bind";
-  const authBackUrl ='https://switch-dy.replit.app/'
+  const authBackUrl ='https://ext.baseopendev.com/ext/switchDy/78bd95bcf3cdc1e6edaedecba8e96599b1c41cee/index.html'
   let state = base64UrlEncode(encodeURIComponent(`{"back":"1"}`)); // encode后拼接到授权链接上
   window.location.href = `https://open.douyin.com/platform/oauth/connect/?client_key=awl98juj5xz2ruu9&response_type=code&state=${state}&scope=${canScope}&redirect_uri=${authBackUrl}`;
 }
