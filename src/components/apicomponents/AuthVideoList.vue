@@ -10,6 +10,7 @@
             >搜索范围</a-typography-text
           >
           <a-range-picker
+          show-time
             class="flex-grow"
             v-model="dateRangeArr"
             :allow-clear="false"
@@ -66,8 +67,8 @@ import dayjs from "dayjs";
 const buttonLoading = ref(false);
 const exportAllFieldArr = ref([]);
 const dateRangeArr = ref([
-  dayjs().startOf("year").format("YYYY-MM-DD"),
-  dayjs().format("YYYY-MM-DD"),
+  dayjs().startOf("year").format("YYYY-MM-DD HH:mm:ss"),
+  dayjs().format("YYYY-MM-DD HH:mm:ss"),
 ]);
 const dy_video_info_dic = ref({
   cover: "视频封面",
@@ -116,6 +117,8 @@ async function exportVoid() {
   );
 
   let i = 0;
+  debugger
+
   exportAllFieldArr.value = await getTableAllFieldFromId(export_table_id.value);
 
   for (const userInfo of allUserArr.value) {
@@ -123,10 +126,11 @@ async function exportVoid() {
       .post("/videolist", {
         open_id: userInfo["open_id"],
         access_token: userInfo["access_token"],
-        start_date: new Date(`${dateRangeArr.value[0]} 00:00:00`).getTime(),
-        end_date: new Date(`${dateRangeArr.value[1]} 23:59:59`).getTime(),
+        start_date: new Date(`${dateRangeArr.value[0]}`).getTime(),
+        end_date: new Date(`${dateRangeArr.value[1]}`).getTime(),
       })
       .catch((err) => {});
+      debugger
     if (resData) {
       // 视频信息
       const newDataArr = resultMapDic(resData, target_filed_dic, userInfo);

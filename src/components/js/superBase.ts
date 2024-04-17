@@ -87,7 +87,11 @@ async function addBitNewField(fileName, tableId, fieldType = FieldType.Text, pro
 // 新增记录
 async function addBitRecord(arr, tableId) {
   const result_table = await bitable.base.getTableById(tableId);
-  const res = await result_table.addRecords(arr);
+  try{
+    const res = await result_table.addRecords(arr);
+  }catch(err){
+    console.log('所处我',err)
+  }
 }
 
 export { bit_all_fieldList, bit_loading, bit_table, addBitNewField, addBitRecord, dy_user_info_dic };
